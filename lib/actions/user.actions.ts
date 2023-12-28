@@ -2,7 +2,13 @@
 
 import { CreateUserParams, UpdateUserParams } from "@/types";
 import { handleError } from "../utils";
-import { base } from "../airtableDB/database";
+// import { base } from "../airtableDB/database";
+export const Airtable = require("airtable");
+Airtable.configure({
+  endpointUrl: "https://api.airtable.com",
+  apiKey: process.env.AIRTABLE_API_TOKEN,
+});
+export const base = Airtable.base([process.env.AIRTABLE_BASE_KEY]);
 
 export const createUser = async (user: CreateUserParams) => {
   try {
@@ -13,7 +19,7 @@ export const createUser = async (user: CreateUserParams) => {
           console.error(err);
           return;
         }
-        console.log("createUser", record);
+        console.log("createUser", record.json());
       }
     );
 
