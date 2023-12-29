@@ -10,20 +10,18 @@ Airtable.configure({
 });
 export const base = Airtable.base([process.env.AIRTABLE_BASE_KEY]);
 
+const minifyUserData = (record: any) => {
+  const newUser = {
+    recordId: record.id,
+    ...record.fields,
+  };
+  return newUser;
+};
+
 export const createUser = async (user: CreateUserParams) => {
   try {
-    const newUser = await base("user").create(
-      { ...user },
-      function (err: any, record: any) {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        console.log("createUser", record.json());
-      }
-    );
-
-    return JSON.parse(JSON.stringify(newUser));
+    const newUser = await base("user").create({ ...user });
+    return minifyUserData(newUser);
   } catch (err) {
     handleError(err);
   }
