@@ -15,6 +15,11 @@ export type UpdateUserParams = {
   photo: string;
 };
 
+export interface ICategory {
+  categoryId: number;
+  name: string;
+}
+
 // ====== EVENT PARAMS
 export type CreateEventParams = {
   userId: string;
@@ -35,8 +40,9 @@ export type CreateEventParams = {
 
 export type UpdateEventParams = {
   userId: string;
+  eventId: string;
   event: {
-    _id: string;
+    _id?: number;
     title: string;
     imageUrl: string;
     description: string;
@@ -47,6 +53,7 @@ export type UpdateEventParams = {
     price: string;
     isFree: boolean;
     url: string;
+    recordId?: string;
   };
   path: string;
 };
@@ -77,7 +84,9 @@ export type GetRelatedEventsByCategoryParams = {
 };
 
 export type Event = {
-  _id: string;
+  recordId: string;
+  createdAt: string;
+  _id?: number;
   title: string;
   description: string;
   price: string;
@@ -87,15 +96,9 @@ export type Event = {
   startDateTime: Date;
   endDateTime: Date;
   url: string;
-  organizer: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-  };
-  category: {
-    _id: string;
-    name: string;
-  };
+  organizer?: string;
+  category: string;
+  username: string;
 };
 
 // ====== CATEGORY PARAMS
@@ -106,7 +109,7 @@ export type CreateCategoryParams = {
 // ====== ORDER PARAMS
 export type CheckoutOrderParams = {
   eventTitle: string;
-  eventId: string;
+  eventId?: number;
   price: string;
   isFree: boolean;
   buyerId: string;

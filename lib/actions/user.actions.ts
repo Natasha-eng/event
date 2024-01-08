@@ -2,15 +2,9 @@
 
 import { CreateUserParams, UpdateUserParams } from "@/types";
 import { handleError } from "../utils";
-// import { base } from "../airtableDB/database";
-export const Airtable = require("airtable");
-Airtable.configure({
-  endpointUrl: "https://api.airtable.com",
-  apiKey: process.env.AIRTABLE_API_TOKEN,
-});
-export const base = Airtable.base([process.env.AIRTABLE_BASE_KEY]);
+import { base } from "../airtableDB/database";
 
-const minifyUserData = (record: any) => {
+export const minifyRecordData = (record: any) => {
   const newUser = {
     recordId: record.id,
     ...record.fields,
@@ -18,10 +12,14 @@ const minifyUserData = (record: any) => {
   return newUser;
 };
 
+export const getMinifiedRecords = (records: any[]) => {
+  return records.map((record: any) => minifyRecordData(record));
+};
+
 export const createUser = async (user: CreateUserParams) => {
   try {
     const newUser = await base("user").create({ ...user });
-    return minifyUserData(newUser);
+    return minifyRecordData(newUser);
   } catch (err) {
     handleError(err);
   }
@@ -29,13 +27,23 @@ export const createUser = async (user: CreateUserParams) => {
 
 export const getUserById = async (userId: string) => {
   try {
-    console.log("getUserById", userId);
-  } catch (err) {}
+    const user = await base("user")
+      .select({
+        filterByFormula: `clerkId="${userId}"`,
+      })
+      .firstPage();
+    if (user) {
+      return minifyRecordData(user[0]);
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const updateUser = async (clerkId: string, user: UpdateUserParams) => {
   try {
-    console.log("update user", clerkId, user);
   } catch (err) {}
 };
 
