@@ -155,7 +155,6 @@ export const getRelatedEventsByCategory = async ({
   categoryId,
   eventId,
   limit = 3,
-  page = 1,
 }: GetRelatedEventsByCategoryParams) => {
   try {
     const eventIdToNumber = Number(eventId);

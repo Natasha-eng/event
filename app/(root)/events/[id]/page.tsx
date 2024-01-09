@@ -76,7 +76,7 @@ const EventDetails = async ({ params: { id }, searchParams }: SearchParamProps) 
                     emptyStateSubtext='Come back later'
                     collectionType='All_Evnets'
                     limit={3}
-                    page={1}
+                    page={'1'}
                     totalPages={2}
                 />
             </section>

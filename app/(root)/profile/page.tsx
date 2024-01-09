@@ -10,7 +10,7 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
     const { sessionClaims } = auth()
     const userId = sessionClaims?.sub as string
 
-    const eventsPage = Number(searchParams.eventsPage) || 1
+    const eventsPage = searchParams.eventsPage as string || '1'
     const organizedEvents = await getEventsByUser({ userId, page: eventsPage })
 
     const ordersPage = Number(searchParams.ordersPage) || 1
