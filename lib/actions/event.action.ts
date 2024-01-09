@@ -72,12 +72,34 @@ export const getCategoryById = async (categoryId: string) => {
   }
 };
 
-export const getAllEvents = async ({
-  query,
-  limit = 3,
-  page,
-  category,
+export const getAllEvents = async () => {
+  const limit = 3;
+  try {
+    const eventsData = await base("event")
+      .select({
+        // filterByFormula: `AND(REGEX_MATCH(title,"${query}"),REGEX_MATCH(categoryId,"${category}"))`,
+
+        sort: [{ field: "createdAt", direction: "desc" }],
+      })
+      .firstPage();
+
+    const events = getMinifiedEventsRecords(eventsData);
+    const eventsCount = events.length;
+    revalidatePath("/");
+    return {
+      data: JSON.parse(JSON.stringify(events)),
+      totalPages: Math.ceil(eventsCount / limit),
+    };
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+export const getFilteredEvents = async ({
+  query = "",
+  category = "",
 }: GetAllEventsParams) => {
+  const limit = 3;
   try {
     const eventsData = await base("event")
       .select({

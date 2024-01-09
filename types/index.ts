@@ -64,10 +64,10 @@ export type DeleteEventParams = {
 };
 
 export type GetAllEventsParams = {
-  query: string;
-  category: string;
-  limit: number;
-  page: number;
+  query?: string;
+  category?: string;
+  // limit?: number;
+  // page: string;
 };
 
 export type GetEventsByUserParams = {
@@ -147,6 +147,6 @@ export type RemoveUrlQueryParams = {
 };
 
 export type SearchParamProps = {
-  params: { id: string };
+  params: { id?: string; slug: any };
   searchParams: { [key: string]: string | string[] | undefined };
 };

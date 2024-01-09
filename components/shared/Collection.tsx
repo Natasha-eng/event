@@ -7,7 +7,7 @@ type CollectionProps = {
     emptyTitle: string,
     emptyStateSubtext: string,
     limit: number,
-    page: number | string,
+    page: string,
     totalPages?: number,
     urlParamName?: string,
     collectionType?: 'Events_Organized' | 'My_Tickets' | 'All_Evnets'
@@ -23,12 +23,17 @@ const Collection = ({
     collectionType,
     urlParamName }: CollectionProps) => {
 
-
+    let events = data
     const skipAmount = (Number(page) - 1) * limit
     const skip = skipAmount + limit
 
-    const events = data?.slice(skipAmount, skip)
+    if (skipAmount >= data?.length!) {
+        events = data
+    } else {
+        events = data?.slice(skipAmount, skip)
+    }
 
+    console.log('coll events', events)
 
     return (
         <>
