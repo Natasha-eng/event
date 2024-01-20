@@ -3,7 +3,6 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '../ui/button';
 import { formUrlQuery } from '@/lib/utils';
-import { useEffect } from 'react';
 
 type PaginationProps = {
     page: string;

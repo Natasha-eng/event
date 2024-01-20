@@ -1,10 +1,10 @@
 import EventForm from '@/components/shared/EventForm'
-import { auth } from '@clerk/nextjs'
+// import { auth } from '@clerk/nextjs'
 
 const CreateEvent = () => {
-    const { sessionClaims } = auth()
+    // const { sessionClaims } = auth()
 
-    const userId = sessionClaims?.sub as string
+    const userId = 'user_2aDnZqWYGVSOYojKfjVcrxUIoBY' //sessionClaims?.sub as string
 
     return (
         <>

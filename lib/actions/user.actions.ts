@@ -3,6 +3,7 @@
 import { CreateUserParams, UpdateUserParams } from "@/types";
 import { handleError } from "../utils";
 import { base } from "../airtableDB/database";
+import { FieldSet, Records } from "airtable";
 
 export const minifyRecordData = (record: any) => {
   const newUser = {
@@ -12,7 +13,7 @@ export const minifyRecordData = (record: any) => {
   return newUser;
 };
 
-export const getMinifiedRecords = (records: any[]) => {
+export const getMinifiedRecords = (records: Records<FieldSet>) => {
   return records.map((record: any) => minifyRecordData(record));
 };
 
@@ -25,7 +26,9 @@ export const createUser = async (user: CreateUserParams) => {
   }
 };
 
-export const getUserById = async (userId: string) => {
+export const getUserById = async (
+  userId = "user_2aDnZqWYGVSOYojKfjVcrxUIoBY"
+) => {
   try {
     const user = await base("user")
       .select({
@@ -50,5 +53,8 @@ export const updateUser = async (clerkId: string, user: UpdateUserParams) => {
 export const deleteUser = async (clerkId: string) => {
   try {
     console.log("delete user", clerkId);
-  } catch (err) {}
+    return { message: "user has been deleted" };
+  } catch (err) {
+    console.log(err);
+  }
 };

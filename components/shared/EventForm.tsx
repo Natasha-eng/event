@@ -7,16 +7,14 @@ import { Button } from "@/components/ui/button"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
-import DatePicker from "react-datepicker";
+import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import { eventFormSchema } from "@/lib/validator"
@@ -32,6 +30,12 @@ import CreateEvent from "@/app/(root)/events/create/page"
 import { useRouter } from "next/navigation"
 import { createEvent, updateEvent } from "@/lib/actions/event.action"
 import { Event } from "@/types"
+import { format, parseISO } from "date-fns"
+// import parseISO from "date-fns/parseISO"
+import el from "date-fns/locale/el"; // the locale you want
+registerLocale("el", el);
+
+
 
 type EventFormProps = {
     userId: string;
@@ -40,13 +44,27 @@ type EventFormProps = {
     event?: Event
 }
 
+export const formatDate = (dateItem: Date) => {
+    const date = new Intl.DateTimeFormat('en-GB', {
+        dateStyle: 'full',
+        timeStyle: 'long',
+        timeZone: 'Australia/Sydney',
+    }).format(dateItem)
+    console.log('dateItem', new Date(dateItem))
+    return date
+}
+
 const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
+
     const [files, setFiles] = useState<File[]>([])
+
+
+
 
     const initialValues = event && type === 'Update' ? {
         ...event,
-        startDateTime: new Date(event.endDateTime),
-        endDateTime: new Date(event.endDateTime)
+        startDateTime: event.endDateTime,
+        endDateTime: event.endDateTime,
     } : eventDefaultValues
     const router = useRouter()
 
@@ -74,15 +92,14 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
         if (type === 'Create') {
             try {
                 const newEvent = await createEvent({
-                    event: { ...values, imageUrl: uploadedImageUrl },
+                    event: { ...values, startDateTime: values?.startDateTime.toString(), endDateTime: values?.endDateTime.toString(), imageUrl: uploadedImageUrl },
                     userId,
                     path: '/profile'
                 })
 
-                if (newEvent) {
-                    form.reset()
-                    router.push(`/events/${newEvent.recordId}`)
-                }
+                form.reset()
+                // router.push(`/events/${newEvent.recordId}`)
+
             } catch (err) {
                 console.log(err)
             }
@@ -97,7 +114,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                 const updatedEvent: Event | undefined = event && await updateEvent({
                     userId,
                     eventId,
-                    event: { ...values, imageUrl: uploadedImageUrl },
+                    event: { ...values, startDateTime: values?.startDateTime.toString(), endDateTime: values?.endDateTime.toString(), imageUrl: uploadedImageUrl },
                     path: `/events/${eventId}`
                 })
 
@@ -199,8 +216,10 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                     <FormField
                         control={form.control}
                         name="startDateTime"
-                        render={({ field }) => (
-                            <FormItem className="w-full">
+                        render={({ field }) => {
+                            console.log('time field.value create start', field.value)
+                            // console.log('time field.value create formatDate start', formatDate(field.value))
+                            return < FormItem className="w-full">
                                 <FormControl>
                                     <div className="flex-center h-[55px] w-full overflow-hidden rounded-full bg-gray-50 px-4 py-2">
                                         <Image
@@ -210,22 +229,29 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                                             height={24}
                                             className="filter-grey" />
                                         <p className="ml-3 whitespace-nowrap text-grey-600">Start Date:</p>
-                                        <DatePicker selected={field.value}
-                                            onChange={(date: Date) => field.onChange(date)}
+
+                                        {/* <DatePicker selected={parseISO(field.value.toString())}
+                                            locale="el"
+                                            required
+                                            onChange={(date: Date) => {
+                                                console.log('locale, onchange')
+                                                field.onChange(date)
+                                            }}
                                             showTimeSelect timeInputLabel="Time:"
-                                            dateFormat='dd/mm/yyyy h:mm aa'
-                                            wrapperClassName="datePicker" />
+                                            dateFormat='dd/MM/yyyy h:mm'
+                                            wrapperClassName="datePicker" /> */}
                                     </div>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
-                        )}
+                        }}
                     />
 
                     <FormField
                         control={form.control}
                         name="endDateTime"
                         render={({ field }) => (
+
                             <FormItem className="w-full">
                                 <FormControl>
                                     <div className="flex-center h-[55px] w-full overflow-hidden rounded-full bg-gray-50 px-4 py-2">
@@ -236,11 +262,14 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                                             height={24}
                                             className="filter-grey" />
                                         <p className="ml-3 whitespace-nowrap text-grey-600">End Date:</p>
-                                        <DatePicker selected={field.value}
+                                        {/* <DatePicker selected={parseISO(field.value.toString())}
+                                            required
                                             onChange={(date: Date) => field.onChange(date)}
                                             showTimeSelect timeInputLabel="Time:"
-                                            dateFormat='dd/mm/yyyy h:mm aa'
-                                            wrapperClassName="datePicker" />
+                                            dateFormat='dd/MM/yyyy h:mm'
+                                            wrapperClassName="datePicker"
+                                            locale="el"
+                                        /> */}
                                     </div>
                                 </FormControl>
                                 <FormMessage />
@@ -276,7 +305,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                                                     <FormControl>
                                                         <div className="flex item-center">
                                                             <label className="whitespace-nowrap pr-3 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" htmlFor='isFree'>Free Ticket</label>
-                                                            <Checkbox checked={field.value} onCheckedChange={field.onChange} id='isFree' className="mr-2 h-5 w-5 border-2 border-primary-500" />
+                                                            <Checkbox required={false} checked={field.value} onCheckedChange={field.onChange} id='isFree' className="mr-2 h-5 w-5 border-2 border-primary-500" />
                                                         </div>
                                                     </FormControl>
                                                     <FormMessage />
@@ -315,8 +344,8 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                 <Button type="submit" size='lg' disabled={form.formState.isSubmitting} className="button col-span-2 w-full" >{form.formState.isSubmitting ? (
                     'Submitting...'
                 ) : `${type} Event`}</Button>
-            </form>
-        </Form>
+            </form >
+        </Form >
     )
 }
 

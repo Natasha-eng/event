@@ -12,18 +12,16 @@ export default async function Home({ searchParams, params }: SearchParamProps) {
   const searchText = (searchParams?.query as string) || ''
   const category = (searchParams?.category as string) || ''
 
-
-  // await getAllEvents({
-  //   query: searchText,
-  //   category: category,
-
-
-  // })
-
   let eventsData;
-  searchText || category ? eventsData = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/getEvents?query=${searchText}&category=${category}`) :
-    eventsData = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/getEvents`)
-  const events = await eventsData.json()
+  let events
+  try {
+    searchText || category ? eventsData = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/getEvents?query=${searchText}&category=${category}`) :
+      eventsData = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/getEvents`)
+    events = await eventsData.json()
+    // console.log('home events', events.data)
+  } catch (err) {
+    console.log('home page error', err)
+  }
 
   return (
     < >

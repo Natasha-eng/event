@@ -33,8 +33,6 @@ const Collection = ({
         events = data?.slice(skipAmount, skip)
     }
 
-    console.log('coll events', events)
-
     return (
         <>
             {data && data?.length > 0 ? (

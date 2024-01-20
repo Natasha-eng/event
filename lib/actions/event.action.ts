@@ -13,6 +13,8 @@ import { handleError } from "../utils";
 import { getUserById, minifyRecordData } from "./user.actions";
 import { base } from "../airtableDB/database";
 import { revalidatePath } from "next/cache";
+import { FieldSet, Records } from "airtable";
+import { redirect } from "next/navigation";
 
 export const minifyRecordEventData = (record: any) => {
   const newRecord = {
@@ -23,20 +25,24 @@ export const minifyRecordEventData = (record: any) => {
   return newRecord;
 };
 
-export const getMinifiedEventsRecords = (records: any[]) => {
+export const getMinifiedEventsRecords = (records: Records<FieldSet>) => {
   return records.map((record: any) => minifyRecordEventData(record));
 };
 
-export const createEvent = async ({
-  event,
-  userId,
-  path,
-}: CreateEventParams) => {
+type CreateEventType = {
+  event: Partial<FieldSet>;
+  userId: string;
+  path: string;
+};
+
+export const createEvent = async ({ event, userId, path }: CreateEventType) => {
   try {
     const organizer = await getUserById(userId);
     if (!organizer) {
       throw new Error("Organizer not found");
     }
+
+    console.log("event ceate date1", event);
 
     const newEvent = await base("event").create({
       ...event,
@@ -44,7 +50,12 @@ export const createEvent = async ({
       organizer: userId,
       username: organizer.username,
     });
-    return minifyRecordEventData(newEvent);
+
+    console.log("event ceate date1 newEvent", newEvent);
+    const eventData = minifyRecordEventData(newEvent);
+    revalidatePath("/");
+    redirect(`/events/${eventData.recordId}`);
+    // return
   } catch (err) {
     handleError(err);
   }
@@ -121,13 +132,43 @@ export const getFilteredEvents = async ({
   }
 };
 
-export const deleteEvent = async ({ eventId, path }: DeleteEventParams) => {
+type DeleteEventType = {
+  eventId: string;
+  path: string;
+};
+
+export const deleteEvent = async ({ eventId, path }: DeleteEventType) => {
   try {
     const deletedEvent = await base("event").destroy(eventId);
-    if (deletedEvent.recordId) revalidatePath(path);
+    if (deletedEvent.id) revalidatePath(path);
+    return { message: "event has been deleted" };
   } catch (err) {
     handleError(err);
   }
+};
+
+// export type Event = {
+//   createdAt: string;
+//   _id?: number;
+//   title: string;
+//   description: string;
+//   price: string;
+//   isFree: boolean;
+//   imageUrl: string;
+//   location: string;
+//   startDateTime: string;
+//   endDateTime: string;
+//   url: string;
+//   organizer?: string;
+//   category: string;
+//   username: string;
+// };
+
+type UpdateEventsType = {
+  userId: string;
+  eventId: string;
+  event: Partial<FieldSet>;
+  path: string;
 };
 
 export const updateEvent = async ({
@@ -135,7 +176,7 @@ export const updateEvent = async ({
   eventId,
   event,
   path,
-}: UpdateEventParams): Promise<Event | undefined> => {
+}: UpdateEventsType): Promise<Event | undefined> => {
   try {
     const eventToUpdate = await getEventById(eventId);
     if (!eventToUpdate || eventToUpdate.organizer !== userId) {

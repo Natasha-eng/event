@@ -2,16 +2,22 @@ import Collection from '@/components/shared/Collection'
 import { Button } from '@/components/ui/button'
 import { getEventsByUser } from '@/lib/actions/event.action'
 import { SearchParamProps } from '@/types'
-import { auth } from '@clerk/nextjs'
+// import { auth } from '@clerk/nextjs'
 import Link from 'next/link'
 import React from 'react'
 
 const ProfilePage = async ({ searchParams }: SearchParamProps) => {
-    const { sessionClaims } = auth()
-    const userId = sessionClaims?.sub as string
+    // const { sessionClaims } = auth()
+    const userId = 'user_2aDnZqWYGVSOYojKfjVcrxUIoBY' //sessionClaims?.sub as string
 
     const eventsPage = searchParams.eventsPage as string || '1'
-    const organizedEvents = await getEventsByUser({ userId, page: eventsPage })
+    let organizedEvents;
+    try {
+        organizedEvents = await getEventsByUser({ userId, page: eventsPage })
+    } catch (err) {
+        console.log('profile err', err)
+    }
+
 
     const ordersPage = Number(searchParams.ordersPage) || 1
 

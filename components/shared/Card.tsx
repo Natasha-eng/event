@@ -1,6 +1,6 @@
 import { formatDateTime } from "@/lib/utils"
 import { Event } from "@/types"
-import { auth } from "@clerk/nextjs"
+// import { auth } from "@clerk/nextjs"
 import Image from "next/image"
 import Link from "next/link"
 import { DeleteConfirmation } from "./DeleteConfirmation"
@@ -12,8 +12,8 @@ type CardProps = {
 }
 
 const Card = ({ event, hasOrderLink, hidePrice }: CardProps) => {
-    const { sessionClaims } = auth()
-    const userId = sessionClaims?.sub as string
+    // const { sessionClaims } = auth()
+    const userId = 'user_2aDnZqWYGVSOYojKfjVcrxUIoBY' //sessionClaims?.sub as string
 
     const isEventCreator = userId === event.organizer
 
@@ -57,7 +57,7 @@ const Card = ({ event, hasOrderLink, hidePrice }: CardProps) => {
 
                 </div>}
                 <p className="p-medium-16 p-medium-18 text-grey-500">
-                    {formatDateTime(event.startDateTime).dateTime}
+                    {formatDateTime(new Date(event.startDateTime)).dateTime}
                 </p>
                 <p className="p-medium-16 md:p-medium-20 line-clamp-2 flex-1 text-black">
                     {event.title}

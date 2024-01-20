@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { handleError } from "../utils";
 import { base } from "../airtableDB/database";
 import { minifyRecordData } from "./user.actions";
+import { FieldSet, Record } from "airtable";
 
 export const checkoutOrder = async (order: CheckoutOrderParams) => {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -41,7 +42,7 @@ export const checkoutOrder = async (order: CheckoutOrderParams) => {
   }
 };
 
-export const createOrder = async (order: CreateOrderParams) => {
+export const createOrder = async (order: Partial<FieldSet>) => {
   try {
     const newOrderData = await base("order").create({
       ...order,
