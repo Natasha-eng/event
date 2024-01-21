@@ -2,7 +2,7 @@ import CategoryFilter from '@/components/shared/CategoryFilter'
 import Collection from '@/components/shared/Collection'
 import Search from '@/components/shared/Search'
 import { Button } from '@/components/ui/button'
-import { getAllEvents } from '@/lib/actions/event.action'
+import { getAllEvents, getEvents } from '@/lib/actions/event.action'
 import { SearchParamProps } from '@/types'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -14,11 +14,19 @@ export default async function Home({ searchParams, params }: SearchParamProps) {
 
   let eventsData;
   let events
+  // try {
+  //   searchText || category ? eventsData = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/getEvents?query=${searchText}&category=${category}`) :
+  //     eventsData = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/getEvents`)
+  //   console.log('home events', eventsData)
+  //   events = await eventsData.json()
+  //   console.log('home events parsed', events)
+  // } catch (err) {
+  //   console.log('home page error', err)
+  // }
+
   try {
-    searchText || category ? eventsData = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/getEvents?query=${searchText}&category=${category}`) :
-      eventsData = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/getEvents`)
-    events = await eventsData.json()
-    // console.log('home events', events.data)
+    events = await getEvents(searchText, category)
+    console.log('events home', events)
   } catch (err) {
     console.log('home page error', err)
   }

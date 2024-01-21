@@ -13,7 +13,7 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
     const eventsPage = searchParams.eventsPage as string || '1'
     let organizedEvents;
     try {
-        organizedEvents = await getEventsByUser({ userId, page: eventsPage })
+        organizedEvents = await getEventsByUser({ userId, limit: eventsPage })
     } catch (err) {
         console.log('profile err', err)
     }
@@ -21,7 +21,7 @@ const ProfilePage = async ({ searchParams }: SearchParamProps) => {
 
     const ordersPage = Number(searchParams.ordersPage) || 1
 
-
+    console.log('organizedEvents', organizedEvents)
     return (
         <>
             {/* my tickets */}

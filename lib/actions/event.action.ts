@@ -86,19 +86,14 @@ export const getCategoryById = async (categoryId: string) => {
 export const getAllEvents = async () => {
   const limit = 3;
   try {
-    const eventsData = await base("event")
-      .select({
-        // filterByFormula: `AND(REGEX_MATCH(title,"${query}"),REGEX_MATCH(categoryId,"${category}"))`,
-
-        sort: [{ field: "createdAt", direction: "desc" }],
-      })
-      .firstPage();
+    const eventsData = await base("event").select().firstPage();
 
     const events = getMinifiedEventsRecords(eventsData);
+    console.log("events get", events);
     const eventsCount = events.length;
     revalidatePath("/");
     return {
-      data: JSON.parse(JSON.stringify(events)),
+      data: events,
       totalPages: Math.ceil(eventsCount / limit),
     };
   } catch (err) {
@@ -115,8 +110,6 @@ export const getFilteredEvents = async ({
     const eventsData = await base("event")
       .select({
         filterByFormula: `AND(REGEX_MATCH(title,"${query}"),REGEX_MATCH(categoryId,"${category}"))`,
-
-        sort: [{ field: "createdAt", direction: "desc" }],
       })
       .firstPage();
 
@@ -124,9 +117,25 @@ export const getFilteredEvents = async ({
     const eventsCount = events.length;
     revalidatePath("/");
     return {
-      data: JSON.parse(JSON.stringify(events)),
+      data: events,
       totalPages: Math.ceil(eventsCount / limit),
     };
+  } catch (err) {
+    handleError(err);
+  }
+};
+
+export const getEvents = async (query: string = "", category: string = "") => {
+  let events;
+  try {
+    query || category
+      ? (events = await getFilteredEvents({
+          query,
+          category,
+        }))
+      : (events = await getAllEvents());
+
+    return events;
   } catch (err) {
     handleError(err);
   }
@@ -219,8 +228,7 @@ type OrganizedData = { data: Event[]; totalPages: number };
 
 export const getEventsByUser = async ({
   userId,
-  limit = 3,
-  page,
+  limit = "3",
 }: GetEventsByUserParams): Promise<OrganizedData | undefined> => {
   try {
     const eventsData = await base("event")
@@ -230,7 +238,7 @@ export const getEventsByUser = async ({
       .firstPage();
 
     const organizedEvents = getMinifiedEventsRecords(eventsData);
-    const totalPages = Math.ceil(organizedEvents.length / limit);
+    const totalPages = Math.ceil(organizedEvents.length / Number(limit));
 
     return {
       data: organizedEvents,
